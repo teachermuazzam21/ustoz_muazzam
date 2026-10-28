@@ -1,5 +1,5 @@
 import streamlit as st
-from google import genai
+from google import interactions
 import pandas as pd
 from datetime import datetime
 
@@ -115,17 +115,13 @@ if role == "O'quvchi":
             
             if st.button("AI orqali tahlil qilish"):
                 api_key_s = st.text_input("Gemini API Key:", type="password")
-                if api_key_s and s_text:
-                    try:
-                        client = genai.Client(api_key=api_key_s)
-                        prompt = f"Siz professional {s_mode} ekspertisiz. Quyidagi speaking matnini tahlil qiling va tavsiyalar bering: \n\n {s_text}"
-                        res = client.models.generate_content(model='gemini-3.8-flash', contents=prompt)
-                        st.info("🤖 AI Tahlili va Tavsiyalar:")
-                        st.markdown(res.text)
-                    except Exception as e:
-                        st.error(f"Xatolik yuz berdi: {e}")
-                else:
-                    st.warning("API kalit va matnni kiriting.")
+               if s_text:
+    with st.spinner("AI tahlil qilmoqda..."):
+        natija = ai_tahlil(s_text)
+    st.info("🤖 AI Tahlili va Tavsiyalar:")
+    st.markdown(natija)
+else:
+    st.warning("Matnni kiriting.")
 
         with tab_g:
             st.subheader("Haftalik Grammar Testi (30 talik)")
@@ -148,7 +144,13 @@ elif role == "O'qituvchi":
     
     if teacher_pass == "admin123":
         st.markdown("### 🛠️ O'qituvchi Boshqaruv Markazi")
-        api_key = st.text_input("Google Gemini API Key:", type="password")
+        if s_text:
+    with st.spinner("AI tahlil qilmoqda..."):
+        natija = ai_tahlil(s_text)
+    st.info("🤖 AI Tahlili va Tavsiyalar:")
+    st.markdown(natija)
+else:
+    st.warning("Matnni kiriting.")
         
         tab1, tab2, tab3, tab4, tab5 = st.tabs(["👥 O'quvchilar", "📋 Davomat", "📝 Mock Boshqaruvi", "🤖 AI Tekshiruv", "📊 Excel Hisobot"])
         
@@ -209,7 +211,7 @@ elif role == "O'qituvchi":
             if st.button("AI Tahlilini Olish"):
                 if api_key and essay_sample:
                     try:
-                        client = genai.Client(api_key=api_key)
+                        client = interactions.Client(api_key=api_key)
                         prompt = f"Ushbu essayni tahlil qiling va o'qituvchiga tavsiyalar bering: {essay_sample}"
                         response = client.models.generate_content(model='gemini-3.8-flash', contents=prompt)
                         st.markdown("### 📋 AI Ekspert Xulosasi:")
